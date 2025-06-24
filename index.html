@@ -9,25 +9,24 @@
       const tdc = urlParams.get("tdc");
 
       if (!tdc) {
-        document.body.innerText = "Erro: TDC não informado.";
+        document.body.innerText = "Erro: TDC não informado na URL.";
         return;
       }
 
       try {
-        const tokenResp = await fetch("https://token-proxy-rodolfo.vercel.app/api/token");
+        // Busca o token via Vercel (proxy HTTPS seguro)
+        const tokenResp = await fetch("https://tdc-token-proxy.vercel.app/api/token"); // ✅ Troque aqui se usar outro domínio
         const data = await tokenResp.json();
-        const token = data.token;
-        const xmlText = await tokenResp.text();
 
-        const match = xmlText.match(/<string[^>]*>(.*?)<\/string>/);
-        const token = match ? match[1] : null;
+        const tokenFinal = data.token;
 
-        if (!token) {
-          document.body.innerText = "Token não encontrado.";
+        if (!tokenFinal) {
+          document.body.innerText = "Erro: Token não encontrado.";
           return;
         }
 
-        const finalUrl = `http://servicoimagenseorderceara.enel.com.br/img_CE_pro/ConsultaImagem/Form?NumeroDoTDC=${tdc}&token=${token}`;
+        // Monta a URL final e redireciona
+        const finalUrl = `http://servicoimagenseorderceara.enel.com.br/img_CE_pro/ConsultaImagem/Form?NumeroDoTDC=${tdc}&token=${tokenFinal}`;
         window.location.href = finalUrl;
       } catch (e) {
         document.body.innerText = "Erro ao obter o token: " + e.message;
