@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch("http://10.154.77.186:8085/wsToken.asmx/GetToken?user=Usuar&password=1234");
+    const response = await fetch("http://10.154.77.186:8085/wsToken.asmx/GetToken?user=ttt&password=tttt");
     const text = await response.text();
 
     // Extrai o token do XML
