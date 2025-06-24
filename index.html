@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecionando...</title>
+  <script>
+    async function redirecionar() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tdc = urlParams.get("tdc");
+
+      if (!tdc) {
+        document.body.innerText = "Erro: TDC não informado.";
+        return;
+      }
+
+      try {
+        const tokenResp = await fetch("http://10.154.77.186:8085/wsToken.asmx/GetToken?user=Usuar&password=1234");
+        const xmlText = await tokenResp.text();
+
+        const match = xmlText.match(/<string[^>]*>(.*?)<\/string>/);
+        const token = match ? match[1] : null;
+
+        if (!token) {
+          document.body.innerText = "Token não encontrado.";
+          return;
+        }
+
+        const finalUrl = `http://servicoimagenseorderceara.enel.com.br/img_CE_pro/ConsultaImagem/Form?NumeroDoTDC=${tdc}&token=${token}`;
+        window.location.href = finalUrl;
+      } catch (e) {
+        document.body.innerText = "Erro ao obter o token: " + e.message;
+      }
+    }
+
+    window.onload = redirecionar;
+  </script>
+</head>
+<body>
+  Redirecionando, por favor aguarde...
+</body>
+</html>
