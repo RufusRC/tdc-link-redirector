@@ -14,22 +14,22 @@
       }
 
       try {
-        // Busca o token via Vercel (proxy HTTPS seguro)
-        const tokenResp = await fetch("https://tdc-token-proxy.vercel.app/api/token"); // ✅ Troque aqui se usar outro domínio
+        // ✅ Buscando token via proxy seguro (Vercel)
+        const tokenResp = await fetch("https://tdc-token-proxy.vercel.app/api/token");
         const data = await tokenResp.json();
-
         const tokenFinal = data.token;
 
         if (!tokenFinal) {
-          document.body.innerText = "Erro: Token não encontrado.";
+          document.body.innerText = "Erro: token não encontrado.";
           return;
         }
 
-        // Monta a URL final e redireciona
+        // ✅ Monta o link final e redireciona
         const finalUrl = `http://servicoimagenseorderceara.enel.com.br/img_CE_pro/ConsultaImagem/Form?NumeroDoTDC=${tdc}&token=${tokenFinal}`;
         window.location.href = finalUrl;
-      } catch (e) {
-        document.body.innerText = "Erro ao obter o token: " + e.message;
+
+      } catch (error) {
+        document.body.innerText = "Erro ao obter o token: " + error.message;
       }
     }
 
