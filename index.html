@@ -1,42 +1,61 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Redirecionando...</title>
-  <script>
-    async function redirecionar() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const tdc = urlParams.get("tdc");
+  <meta charset="UTF-8">
+  <title>Redirecionando...</title>
+  <script>
+    async function redirecionar() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tdc = urlParams.get("tdc");
 
-      if (!tdc) {
-        document.body.innerText = "Erro: TDC não informado na URL.";
-        return;
-      }
+      if (!tdc) {
+        document.body.innerText = "Erro: TDC não informado na URL.";
+        return;
+      }
 
-      try {
-        // ✅ Buscando token via proxy seguro (Vercel)
-        const tokenResp = await fetch("https://tdc-token-proxy.vercel.app/api/token");
-        const data = await tokenResp.json();
-        const tokenFinal = data.token;
+      try {
+        // ✅ URL do serviço de token interno (usando user e password)
+        const tokenServiceUrl = "http://10.154.77.186:8085/wsToken.asmx/GetToken?user=Usuar&password=1234";
+        
+        // Faz a requisição HTTP para o serviço de token
+        const tokenResp = await fetch(tokenServiceUrl);
+        
+        // Dependendo do formato da resposta do seu serviço, você precisará ajustar aqui:
+        // Se retorna JSON (mais comum hoje):
+        // const data = await tokenResp.json();
+        // const tokenFinal = data.token; 
+        
+        // Se retorna texto puro (como um token direto na resposta):
+        const tokenFinal = await tokenResp.text(); // <--- Provavelmente é isso, se retorna só o texto do token.
 
-        if (!tokenFinal) {
-          document.body.innerText = "Erro: token não encontrado.";
-          return;
-        }
+        // Se retornar XML, você precisaria parsear o XML para extrair o token.
+        // Exemplo para XML (mais complexo, caso o .text() não funcione):
+        // const xmlText = await tokenResp.text();
+        // const parser = new DOMParser();
+        // const xmlDoc = parser.parseFromString(xmlText, "application/xml");
+        // const tokenFinal = xmlDoc.getElementsByTagName("string")[0].textContent; // Ajuste 'string' se a tag for outra
 
-        // ✅ Monta o link final e redireciona
-        const finalUrl = `http://servicoimagenseorderceara.enel.com.br/img_CE_pro/ConsultaImagem/Form?NumeroDoTDC=${tdc}&token=${tokenFinal}`;
-        window.location.href = finalUrl;
+        if (!tokenFinal || tokenFinal.includes("Erro") || tokenFinal.trim() === "") { // Adiciona validação para erros ou vazio
+          document.body.innerText = "Erro: token não encontrado ou inválido.";
+          return;
+        }
 
-      } catch (error) {
-        document.body.innerText = "Erro ao obter o token: " + error.message;
-      }
-    }
+        // ✅ Monta o link final com o TDC e o token
+        // Mantenho a URL original que você indicou para o serviço de imagens
+        const finalUrl = `http://servicoimagenseorderceara.enel.com.br/img_CE_pro/ConsultaImagem/Form?NumeroDoTDC=${tdc}&token=${tokenFinal}`;
+        
+        // ✅ Redireciona o navegador
+        window.location.href = finalUrl;
 
-    window.onload = redirecionar;
-  </script>
+      } catch (error) {
+        document.body.innerText = "Erro ao obter o token ou redirecionar: " + error.message;
+      }
+    }
+
+    window.onload = redirecionar;
+  </script>
 </head>
 <body>
-  Redirecionando, por favor aguarde...
+  Redirecionando, por favor aguarde...
 </body>
 </html>
